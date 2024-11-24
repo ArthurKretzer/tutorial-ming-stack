@@ -1,0 +1,81 @@
+services:
+
+  # MQTT service using Eclipse Mosquitto
+  mqtt:
+    image: eclipse-mosquitto:2.0.20 # Official Mosquitto MQTT broker image
+    container_name: mqtt_broker
+    ports:
+      - "1883:1883" # Default MQTT port
+      - "9001:9001" # WebSocket port
+    volumes:
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf:ro # Mount the custom configuration
+      - mosquitto_config:/mosquitto/config # Custom configuration files
+      - mosquitto_logs:/mosquitto/log # Logs directory
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m" # Limit log size to 10MB
+        max-file: "3"   # Keep a maximum of 3 log files
+
+  # InfluxDB for time-series data storage
+  influxdb:
+    image: influxdb:2.7.10-alpine # Official InfluxDB image
+    container_name: influxdb
+    ports:
+      - "8086:8086" # InfluxDB HTTP API port
+    volumes:
+      - influxdb_data:/var/lib/influxdb # Data storage for persistence
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Node-RED for visual programming
+  node-red:
+    image: nodered/node-red:4.0.5-22-minimal # Official Node-RED image
+    container_name: node_red
+    ports:
+      - "1880:1880" # Node-RED web interface port
+      - "53880:53880" # OPC-UA server port
+    volumes:
+      - node_red_data:/data # Data storage for persistence
+    environment:
+      - NODE_RED_ENABLE_PROJECTS=true # Enable Node-RED projects feature
+    command: >
+      /bin/bash -c "
+        npm install node-red-contrib-opcua@0.2.337 node-red-dashboard node-red-contrib-influxdb@0.7.0 &&
+        npm start
+      "
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Grafana for data visualization
+  grafana:
+    env_file:
+      - .env
+    image: grafana/grafana:11.3.1 # Official Grafana image
+    container_name: grafana
+    ports:
+      - "3000:3000" # Grafana web interface port
+    volumes:
+      - grafana_data:/var/lib/grafana # Data storage for persistence
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin # Admin user for Grafana
+      - GF_SECURITY_ADMIN_PASSWORD=admin_password # Admin password
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  mosquitto_data:
+  mosquitto_config:
+  mosquitto_logs:
+  influxdb_data:
+  node_red_data:
+  grafana_data:
