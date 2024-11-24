@@ -24,7 +24,11 @@ The MING stack is a powerful combination of tools designed for monitoring and an
 
 4. **Grafana**: A visualization platform for displaying metrics and logs from a variety of data sources.
 
+![ming-stack](images/ming.png)
+
 This project provides a pre-configured Docker Compose setup for deploying the MING stack with pre-installed Node-RED nodes for OPC-UA and InfluxDB integration.
+
+![application](images/tutorial.jpg)
 
 ## Features
 
