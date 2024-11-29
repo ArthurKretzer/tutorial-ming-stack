@@ -63,9 +63,6 @@ services:
       - "3000:3000" # Grafana web interface port
     volumes:
       - grafana_data:/var/lib/grafana # Data storage for persistence
-    environment:
-      - GF_SECURITY_ADMIN_USER=admin # Admin user for Grafana
-      - GF_SECURITY_ADMIN_PASSWORD=admin_password # Admin password
     logging:
       driver: "json-file"
       options:
